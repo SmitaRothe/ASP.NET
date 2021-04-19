@@ -1,0 +1,178 @@
+﻿@model CarRentalSystem.Models.Rental
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2 style="color:blue">Rent a Car</h2>
+
+
+
+@using (Html.BeginForm("Create", "Rentals", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+
+
+    <div class="form-horizontal">
+        
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.CarId, "CarId", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("CarId", null, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.CarId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Customer.CustomerId, "CustomerId", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("CustomerId", null, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.CustomerId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.RentalDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="date" id="RentalDate" name="RentalDate" class="form-control" />
+                @Html.ValidationMessageFor(model => model.RentalDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ReturnDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="date" id="ReturnDate" name="ReturnDate" class="form-control" />
+                @Html.ValidationMessageFor(model => model.ReturnDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Total Days</label>
+            <div class="col-md-10">
+                <input type="text" id="TotalDays" name="TotalDays" disabled class="form-control" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TotalFee, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="text" id="TotalFee" name="TotalFee"  class="form-control" />
+                @*@Html.EditorFor(model => model.TotalFee, new { htmlAttributes = new { @class = "form-control" } })*@
+                @Html.ValidationMessageFor(model => model.TotalFee, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Comments, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="text" id="Comments" name="Comments" class="form-control" placeholder="Comments" />
+                @Html.ValidationMessageFor(model => model.Comments, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+}
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    <script src="~/Scripts/jquery-1.12.4.js"></script>
+    <script src="~/Scripts/jquery-1.12.4.min.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        //getCars();
+        //getCustomers();
+        load();
+
+        function load() {
+            $('#RentalDate').attr("disabled", "disabled");
+            $('#ReturnDate').attr("disabled", "disabled");
+            $('#TotalDays').attr("disabled", "disabled");
+            $('#TotalFee').attr("disabled", "disabled");
+            $('#Comments').attr("disabled", "disabled");
+        }
+
+        //available function will be invoked when the carId will be changed
+        $("#CarId").change(function () {
+            available();
+        });
+
+        //function for getting total no of days for the rental
+        $("#ReturnDate").change(function () {
+            var returnDate = new Date($('#ReturnDate').val());
+            var rentDate = new Date($('#RentalDate').val());
+            days = (returnDate - rentDate) / (1000 * 60 * 60 * 24);
+            
+            if (days > 0) {
+                $("#TotalDays").attr("disabled", "disabled");
+                $("#TotalDays").val(days);
+            } else {
+                $("#TotalDays").attr("disabled", "disabled");
+                alert("Return date must be greater than Rental date");
+                new Date($('#ReturnDate').val(""));
+            }
+            
+        });
+
+        //we call function calcPrice when the total Days are changed
+        $("#ReturnDate").change(function () {
+            calcPrice();
+        });
+
+        //function for getting the availability of the cars
+        function available() {
+            $.ajax({
+                type: 'POST',
+                url: 'GetAvailability?CarId=' + $('#CarId').val(),
+                dataType: 'JSON',
+                success: function (data) {
+                    console.log(data);
+
+                    var avail = data;
+                    if (avail == true) {
+                        $('#RentalDate').removeAttr("disabled");
+                        $('#ReturnDate').removeAttr("disabled");
+                        $('#TotalFee').removeAttr("disabled");
+                        $('#Comments').removeAttr("disabled");
+                    } else {
+                        $('#RentalDate').attr("disabled", "disabled");
+                        $('#ReturnDate').attr("disabled", "disabled");
+                        $('#TotalDays').attr("disabled", "disabled");
+                        $('#TotalFee').attr("disabled", "disabled");
+                        $('#Comments').attr("disabled", "disabled");
+                    }
+                }
+            });
+        }
+
+        function calcPrice() {
+
+            $.ajax({
+                type: 'POST',
+                url: 'CalcPrice?CarId=' + $('#CarId').val(),
+                dataType: 'JSON',
+                success: function (data) {
+                    console.log(data);
+                    var carPrice = data;
+                    var days = $('#TotalDays').val()
+                    var totalPrice = carPrice * days;
+                    $("#TotalFee").val(totalPrice);
+                }
+            });
+        }
+    </script>
+}

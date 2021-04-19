@@ -1,0 +1,101 @@
+﻿@using CarRentalSystem.Models
+@using CarRentalSystem.Helper
+@using PagedList.Mvc
+@model PagedList.IPagedList<CarRentalSystem.Models.Car>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<table class="table">
+    <tr>
+        <th>
+            <b style="color:dodgerblue">RegNum</b>
+        </th>
+        <th>
+            @Html.ActionLink("Make", "Index", new { sortOrder = "Make", sortDir = string.IsNullOrEmpty(ViewBag.sortDir) ? "asc" : (ViewBag.sortDir == "asc" ? "desc" : "asc"), searchString = ViewBag.CurrentFilter })
+            @Html.GetArrow((string)ViewBag.sortOrder, "Make", (string)ViewBag.sortDir)
+        </th>
+        <th>
+            <b style="color:dodgerblue">Model</b>
+        </th>
+        <th>
+            @Html.ActionLink("CarYear", "Index", new { sortOrder = "CarYear", sortDir = string.IsNullOrEmpty(ViewBag.sortDir) ? "asc" : (ViewBag.sortDir == "asc" ? "desc" : "asc"), searchString = ViewBag.CurrentFilter })
+            @Html.GetArrow((string)ViewBag.sortOrder, "CarYear", (string)ViewBag.sortDir)
+        </th>
+        <th>
+            <b style="color:dodgerblue">Car Category</b>
+        </th>
+        <th>
+            <b style="color:dodgerblue">Passenger Capacity</b>
+        </th>
+        <th>
+            <b style="color:dodgerblue">IsAvailable?</b>
+        </th>
+        <th>
+            <b style="color:dodgerblue">RentalFee</b>
+        </th>
+        <th>
+            <b style="color:dodgerblue">Car Image</b>
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegNum)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Make)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Model)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CarYear)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CarCategory)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PassengerCapacity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsAvailable)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RentalFee)
+            </td>
+            <td>
+                @if (item.Photo != null)
+                {
+                    @Html.GetThumbnail(item.Photo, 150, 150)
+                }
+            </td>
+            <td>
+                <a>@Html.ActionLink("Edit", "Edit", new { id = item.CarId }) |</a>
+                <a>@Html.ActionLink("Details", "Details", new { id = item.CarId }) |</a>
+                @if (User.IsInRole(RoleName.CanManange))
+                {
+                    <a>@Html.ActionLink("Delete", "Delete", new { id = item.CarId })</a>
+                }
+            </td>
+        </tr>
+    }
+
+</table>
+
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+
+@Html.PagedListPager(
+            Model,
+            page => Url.Action("Index",
+            new { page, sortOrder = ViewBag.SortOrder, sortDir = ViewBag.SortDir, currentFilter = ViewBag.CurrentFilter }),
+            PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "grid" })
+        )
+
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>

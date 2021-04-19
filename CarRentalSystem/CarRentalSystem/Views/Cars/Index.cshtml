@@ -1,0 +1,124 @@
+﻿@using CarRentalSystem.Models
+@using CarRentalSystem.Helper
+@model PagedList.IPagedList<CarRentalSystem.Models.Car>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<center><h2 style="color:blue">Cars</h2></center>
+@if (User.IsInRole(RoleName.CanManange))
+{
+    <p>
+        @Html.ActionLink("Create New", "Create")
+    </p>
+}
+    @Scripts.Render("~/bundles/jquery")
+    <!--Search bar-->
+    <div class="row">
+        <div class="col-md-12">
+            @using (Ajax.BeginForm("Index", "Cars", new AjaxOptions()
+            {
+                HttpMethod = "GET",
+                InsertionMode = InsertionMode.Replace,
+                UpdateTargetId = "grid"
+            }))
+            {
+                <div class="input-group-addon row">
+                    <input class="form-control"
+                           placeholder="Car" name="searchString"
+                           type="text" value="@ViewBag.CurrentFilter" />
+                    <div class="input-group-addon">
+                        <button class="btn btn-primary form-control" type="submit">Search</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <!--Search bar-->
+    @*<table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.RegNum)
+                </th>
+                <th>
+                    @Html.ActionLink("Make", "Index", new { sortOrder = "Make", sortDir = string.IsNullOrEmpty(ViewBag.sortDir) ? "asc" : (ViewBag.sortDir == "asc" ? "desc" : "asc"), searchString = ViewBag.CurrentFilter })
+                    @Html.GetArrow((string)ViewBag.sortOrder, "Make", (string)ViewBag.sortDir)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Model)
+                </th>
+                 <th>
+                    @Html.ActionLink("CarYear", "Index", new { sortOrder = "CarYear", sortDir = string.IsNullOrEmpty(ViewBag.sortDir) ? "asc" : (ViewBag.sortDir == "asc" ? "desc" : "asc"), searchString = ViewBag.CurrentFilter })
+                    @Html.GetArrow((string)ViewBag.sortOrder, "CarYear", (string)ViewBag.sortDir)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CarCategory)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PassengerCapacity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IsAvailable)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.RentalFee)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Photo)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RegNum)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Make)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Model)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CarYear)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CarCategory)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PassengerCapacity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsAvailable)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RentalFee)
+                    </td>
+                    <td>
+                        @if (item.Photo != null)
+                        {
+                            @Html.GetThumbnail(item.Photo, 150, 150)
+                        }
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.CarId }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.CarId }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.CarId })
+                    </td>
+                </tr>
+            }
+
+        </table>*@
+
+    @section validation{
+        <script src="~/Scripts/jquery.validate.js"></script>
+        <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    }
+
+    <div id="grid">
+        @Html.Partial("_searchList", Model)
+    </div>

@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <center><h1 style="color:blue;">JAC Car Rental System</h1></center>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="row">
+            <div class="col-md-12">
+                <input type="button" value="Cars" onclick="location.href='@Url.Action("Index", "Cars")'" class="btn btn-primary btn-lg btn-block" />
+                <br />
+                <br />
+                <input type="button" value="Customers" onclick="location.href='@Url.Action("Index", "Customers")'" class="btn btn-primary btn-lg btn-block" />
+                <br />
+                <br />
+                <input type="button" value="Rentals" onclick="location.href='@Url.Action("Index", "Rentals")'" class="btn btn-primary btn-lg btn-block" />
+                <br />
+                <br />
+                <input type="button" value="About Us" onclick="location.href='@Url.Action("About", "Home")'" class="btn btn-primary btn-lg btn-block" />
+                <br />
+                <br />
+                <input type="button" value="Contact Us" onclick="location.href='@Url.Action("Contact", "Home")'" class="btn btn-primary btn-lg btn-block" />
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-9">
+
+        <img src="~/Images/2014-nissanGT-R.png" />
+    </div>
+
+    
+</div>
